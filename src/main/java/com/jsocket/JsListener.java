@@ -13,12 +13,15 @@ public class JsListener {
     protected List<JsClient> clientList;
     protected HashMap<String, IEchoHandler> echoHandlers;
     protected Thread thread;
+    protected Emit emit;
 
     public JsListener(int port) {
         this.port = port;
         this.isDisconnect = false;
         this.clientList = new ArrayList<>();
         this.echoHandlers = new HashMap<>();
+        this.emit = new Emit();
+
     }
 
     public void start() {
@@ -56,7 +59,28 @@ public class JsListener {
     }
 
     public Emit onEmit() {
-        return new Emit(this.clientList);
+        emit.clientList = clientList;
+        return emit;
+    }
+
+    public Emit onEmitTo(String id) {
+        emit.clientList = clientList;
+        return emit;
+    }
+
+    public Emit onEmitToMany(List<String> ids) {
+        emit.clientList = clientList;
+        return emit;
+    }
+
+    public Emit onEmitToRoom(String room) {
+        emit.clientList = clientList;
+        return emit;
+    }
+
+    public Emit onEmitToRooms(List<String> rooms) {
+        emit.clientList = clientList;
+        return emit;
     }
 
     public void stop() {
@@ -69,5 +93,10 @@ public class JsListener {
 
     public boolean isDisconnect() {
         return isDisconnect;
+    }
+
+    public void removeDisconnect() {
+        List<JsClient> jsClients = clientList.stream().filter(c -> c.socket.isClosed()).toList();
+        clientList.removeAll(jsClients);
     }
 }
